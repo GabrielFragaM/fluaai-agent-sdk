@@ -104,7 +104,7 @@ class AgentResponse:
         raise KeyError(f"'{key}' não encontrado em AgentResponse")
 
 class Agent:
-    AGENT_API_URL = "https://fluaai-agent-integration.azurewebsites.net/chat"
+    AGENT_API_URL = "https://chat-stream-api.azurewebsites.net/chat"
     
     @staticmethod
     async def agent_invoke(
@@ -116,6 +116,8 @@ class Agent:
         # New auth parameters
         auth_token: str = None,
         api_key: str = None,
+        channel: str = "integration",
+        dynamic_variables: Optional[Dict[str, Any]] = None,
     ) -> Union[Tuple[bool, Dict], AsyncGenerator[Tuple[bool, Dict], None]]:
         """
         Invoca um agente com opções de streaming flexíveis e autenticação.
@@ -128,6 +130,8 @@ class Agent:
             on_chunk: Callback opcional para processar chunks em tempo real
             auth_token: Token JWT para autenticação (opcional)
             api_key: Chave de API para autenticação (opcional)
+            channel: Identificador da chamada (opcional)
+            dynamic_variables: Variáveis dinâmica (opcional)
             auth_type: Tipo de autenticação a ser usado (TOKEN ou API_KEY)
             
         Returns:
@@ -148,7 +152,9 @@ class Agent:
         request_body = {
             "message": prompt,
             "agent_id": agent_id,
-            "conversation_id": conversation_id
+            "conversation_id": conversation_id,
+            "channel": channel,
+            "dynamic_variables": dynamic_variables
         }
         
         # Set up headers with authentication

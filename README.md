@@ -5,7 +5,7 @@ SDK em Python para interagir com a API de Agentes da Fluaai, oferecendo integra�
 ## Instalação
 
 ```bash
-pip install fluaai-agent-sdk
+pip install fluaaiagentsdk
 ```
 
 ## Funcionalidades
@@ -22,7 +22,7 @@ pip install fluaai-agent-sdk
 
 ```python
 import asyncio
-from agent import Agent, StreamMode
+from fluaaiagentsdk import Agent, StreamMode
 
 async def main():
     # Invocar um agente e receber a resposta completa
@@ -30,7 +30,9 @@ async def main():
         prompt="Olá, me fale sobre o Brasil",
         agent_id="seu_agent_id",
         api_key="sua_chave_api_key",
-        stream_mode=StreamMode.DISABLED
+        dynamic_variables={"client_name": "Gabriel"},
+        channel="integration | whatsapp | telegram",
+        dynamic_variables=StreamMode.DISABLED
     )
     
     if success:
@@ -55,7 +57,7 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from agent import Agent, StreamMode
+from fluaaiagentsdk import Agent, StreamMode
 
 async def main():
     # Receber resposta em tempo real via streaming
@@ -63,6 +65,8 @@ async def main():
         prompt="Gere uma imagem de montanhas",
         agent_id="seu_agent_id",
         api_key="sua_chave_api_key",
+        dynamic_variables={"client_name": "Gabriel"},
+        channel="integration | whatsapp | telegram",
         stream_mode=StreamMode.ENABLED
     ):
         if success:
@@ -159,22 +163,3 @@ if success:
         status = response["args"]["status"]
         live_url = response["args"]["live_url"]
 ```
-
-## Dicas de uso
-
-1. **Para interfaces gráficas**: Use `response.to_json()` para obter o JSON e enviá-lo para o frontend
-
-2. **Verificações de tipo**: Aproveite a tipagem para autocompletar e validação em IDEs
-
-3. **Acesso uniforme**: Use diretamente os atributos principais em vez de acessar via `args`
-   ```python
-   # Antes
-   status = response.get("args", {}).get("status")
-   
-   # Agora
-   status = response.status  # Mais direto e tipado
-   ```
-
-## Documentação Completa
-
-Para mais detalhes sobre todas as funcionalidades e parâmetros disponíveis, consulte a documentação completa em [docs.fluaai.com](https://docs.fluaai.com).# fluaai-agent-sdk
