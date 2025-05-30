@@ -22,33 +22,29 @@ pip install fluaaiagentsdk
 
 ```python
 import asyncio
-from fluaaiagentsdk import Agent, StreamMode
+from fluaaiagentsdk import Agent, Channels
 
 async def main():
     # Invocar um agente e receber a resposta completa
-    success, response = await Agent.agent_invoke(
+    response = await Agent.agent_invoke(
         prompt="Olá, me fale sobre o Brasil",
         agent_id="seu_agent_id",
         api_key="sua_chave_api_key",
         dynamic_variables={"client_name": "Gabriel"},
-        channel="integration | whatsapp | telegram",
-        dynamic_variables=StreamMode.DISABLED
+        channel=Channels.integration
     )
+
+    # Acesso como objeto tipado
+    print(f"Engine: {response.engine}")
+    print(f"Resposta: {response.output}")
     
-    if success:
-        # Acesso como objeto tipado
-        print(f"Engine: {response.engine}")
-        print(f"Resposta: {response.output}")
-        
-        # Acesso como dicionário (compatibilidade)
-        print(f"Engine: {response['engine']}")
-        print(f"Resposta: {response['output']}")
-        
-        # Conversão para JSON
-        json_str = response.to_json()
-        print(f"JSON: {json_str[:100]}...")
-    else:
-        print(f"Erro: {response.output}")
+    # Acesso como dicionário (compatibilidade)
+    print(f"Engine: {response['engine']}")
+    print(f"Resposta: {response['output']}")
+    
+    # Conversão para JSON
+    json_str = response.to_json()
+    print(f"JSON: {json_str[:100]}...")
 
 asyncio.run(main())
 ```
@@ -57,30 +53,26 @@ asyncio.run(main())
 
 ```python
 import asyncio
-from fluaaiagentsdk import Agent, StreamMode
+from fluaaiagentsdk import Agent, Channels
 
 async def main():
     # Receber resposta em tempo real via streaming
-    async for success, chunk in Agent.agent_invoke(
+    async for chunk in await Agent.agent_invoke(
         prompt="Gere uma imagem de montanhas",
         agent_id="seu_agent_id",
         api_key="sua_chave_api_key",
         dynamic_variables={"client_name": "Gabriel"},
-        channel="integration | whatsapp | telegram",
-        stream_mode=StreamMode.ENABLED
+        channel=Channels.integration
     ):
-        if success:
-            # Acessar como objeto
-            print(chunk.output, end="", flush=True)
-            
-            # Para agentes Operador, verificar status
-            if chunk.engine == "operator" and chunk.status:
-                if chunk.status == "completed":
-                    print(f"\n[Tarefa concluída]")
-                    print(f"URL ao vivo: {chunk.live_url}")
-                    print(f"URL's das ações: {chunk.screenshots}")
-        else:
-            print(f"\nErro: {chunk.output}")
+        # Acessar como objeto
+        print(chunk.output, end="", flush=True)
+        
+        # Para agentes Operador, verificar status
+        if chunk.engine == "operator" and chunk.status:
+            if chunk.status == "finished":
+                print(f"\n[Tarefa concluída]")
+                print(f"URL ao vivo: {chunk.live_url}")
+                print(f"URL's das ações: {chunk.screenshots}")
 
 asyncio.run(main())
 ```
@@ -99,7 +91,7 @@ O SDK retorna respostas como objetos estruturados da classe `AgentResponse`:
 **Atributos para engine operator:**
 - `task_id`: ID da tarefa do operador
 - `live_url`: URL para visualizar a execução em tempo real
-- `status`: Status da tarefa ("running", "completed", "failed")
+- `status`: Status da tarefa ("created", "running", "finished", "stopped", "paused", "failed")
 - `screenshots`: Lista de URLs de screenshots das ações
 
 **Métodos:**
@@ -107,14 +99,6 @@ O SDK retorna respostas como objetos estruturados da classe `AgentResponse`:
 - `to_json()`: Converte para string JSON
 - `from_dict(data)`: Cria objeto a partir de dicionário
 - `from_json(json_str)`: Cria objeto a partir de JSON
-
-### Classe Message
-
-**Atributos:**
-- `role`: Papel da mensagem ("system", "user", "assistant", "tool")
-- `content`: Conteúdo da mensagem
-- `tool_calls`: Lista de chamadas de ferramentas (para assistentes)
-- `tool_call_id`: ID da ferramenta (para mensagens de resultado)
 
 ## Formatos de Resposta por Engine
 
@@ -137,7 +121,7 @@ AgentResponse(
     output="Resultado completo da tarefa do operador...",
     task_id="661d49e4-aada-4d90-abc7-baba34a7b762",
     live_url="https://live.anchorbrowser.io?sessionId=98e2dd75-33d6-44ab-9e4f-9298e8817cc5",
-    status="completed",
+    status="finished",
     screenshots=[...]  # URLs de screenshots
 )
 ```
@@ -145,7 +129,7 @@ AgentResponse(
 ## Trabalhando com Ferramentas
 
 ```python
-success, response = await Agent.agent_invoke(...)
+response = await Agent.agent_invoke(...)
 ```
 
 ## Compatibilidade com Código Existente
@@ -154,12 +138,12 @@ Todo código que utilizava o formato de dicionário continuará funcionando:
 
 ```python
 # Código existente continua compatível
-success, response = await Agent.agent_invoke(...)
-if success:
-    output = response["output"]
-    engine = response["engine"]
-    
-    if engine == "operator":
-        status = response["args"]["status"]
-        live_url = response["args"]["live_url"]
+response = await Agent.agent_invoke(...)
+
+output = response["output"]
+engine = response["engine"]
+
+if engine == "operator":
+    status = response["args"]["status"]
+    live_url = response["args"]["live_url"]
 ```
