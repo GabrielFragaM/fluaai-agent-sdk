@@ -15,6 +15,7 @@ SDK em Python para interagir com a API de Agentes da Fluaai, oferecendo integra�
 - Respostas tipadas com classes ou compatíveis com JSON
 - Suporte a ferramentas e processamento de conversas
 
+*1.0.8 - Fix :)
 *1.0.7 - Refactor
 *1.0.6 - Fix & Simplificação das variáveis dinâmicas.
 *1.0.5 - Atualização de serviço.
@@ -32,7 +33,7 @@ except:
 
 setup(
     name="fluaaiagentsdk",
-    version="1.0.7",
+    version="1.0.8",
     author="Gabriel Fraga",
     author_email="gabriellff130@gmail.com",
     description="SDK para integração com agentes da plataforma FluaAI",

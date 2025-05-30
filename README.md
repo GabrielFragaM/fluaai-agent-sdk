@@ -16,39 +16,6 @@ pip install fluaaiagentsdk
 - Respostas tipadas com classes ou compatíveis com JSON
 - Suporte a ferramentas e processamento de conversas
 
-## Uso Básico
-
-### Exemplo Simples
-
-```python
-import asyncio
-from fluaaiagentsdk import Agent, Channels
-
-async def main():
-    # Invocar um agente e receber a resposta completa
-    response = await Agent.agent_invoke(
-        prompt="Olá, me fale sobre o Brasil",
-        agent_id="seu_agent_id",
-        api_key="sua_chave_api_key",
-        dynamic_variables={"client_name": "Gabriel"},
-        channel=Channels.integration
-    )
-
-    # Acesso como objeto tipado
-    print(f"Engine: {response.engine}")
-    print(f"Resposta: {response.output}")
-    
-    # Acesso como dicionário (compatibilidade)
-    print(f"Engine: {response['engine']}")
-    print(f"Resposta: {response['output']}")
-    
-    # Conversão para JSON
-    json_str = response.to_json()
-    print(f"JSON: {json_str[:100]}...")
-
-asyncio.run(main())
-```
-
 ### Streaming em Tempo Real
 
 ```python
@@ -104,7 +71,6 @@ O SDK retorna respostas como objetos estruturados da classe `AgentResponse`:
 
 ### 1. Engine 'llm' (LLM tradicional)
 
-Resposta sem streaming:
 ```python
 AgentResponse(
     engine="llm",
@@ -114,7 +80,6 @@ AgentResponse(
 
 ### 2. Engine 'operator' (Operador)
 
-Resposta sem streaming:
 ```python
 AgentResponse(
     engine="operator",
@@ -124,26 +89,4 @@ AgentResponse(
     status="finished",
     screenshots=[...]  # URLs de screenshots
 )
-```
-
-## Trabalhando com Ferramentas
-
-```python
-response = await Agent.agent_invoke(...)
-```
-
-## Compatibilidade com Código Existente
-
-Todo código que utilizava o formato de dicionário continuará funcionando:
-
-```python
-# Código existente continua compatível
-response = await Agent.agent_invoke(...)
-
-output = response["output"]
-engine = response["engine"]
-
-if engine == "operator":
-    status = response["args"]["status"]
-    live_url = response["args"]["live_url"]
 ```

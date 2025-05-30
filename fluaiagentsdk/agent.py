@@ -73,7 +73,7 @@ class AgentResponse:
         raise KeyError(f"'{key}' não encontrado em AgentResponse")
 
 class Agent:
-    CHAT_STREAM_API_URL = "http://localhost:8000/chat"
+    CHAT_STREAM_API_URL = "https://chat-stream-api.azurewebsites.net/chat"
     
     @staticmethod
     async def agent_invoke(
